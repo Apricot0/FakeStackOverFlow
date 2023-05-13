@@ -12,7 +12,10 @@ export default function QuestionPage({ changeToPage }) {
   // questionSideItem.classList.add('active');
 
   const [ordering, setOrdering] = useState('Newest')
+  const isLoggedIn = document.cookie.includes('isLoggedIn=true');
   const [questions, setQuestions] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  const questionsPerPage = 5;
   // Create the header element
   const handleOrderingChange = async (page) => {
     setOrdering(page)
@@ -27,7 +30,7 @@ export default function QuestionPage({ changeToPage }) {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/questions?ordering=${ordering}`)
-        // console.log(response.data);
+        console.log(response.data);
         setQuestions(response.data)
       } catch (error) {
         console.error(error)
@@ -39,12 +42,14 @@ export default function QuestionPage({ changeToPage }) {
     <div className="header">
       <div className="headerTop">
         <div className="headerTitle">All Questions</div>
-        <button
-          className="headerButton"
-          onClick={() => changeToPage('questionModal')}
-        >
-          Ask Question
-        </button>
+        {isLoggedIn &&
+          <button
+            className="headerButton"
+            onClick={() => changeToPage('questionModal')}
+          >
+            Ask Question
+          </button>
+        }
       </div>
       <div className="headerBottom">
         <div className="headerNumber">{questions.length} Questions</div>
@@ -92,16 +97,39 @@ export default function QuestionPage({ changeToPage }) {
     )
   } else {
     // console.log(questions);
-    questionItems = questions.map((question) => (
+    var indexOfLastQuestion = currentPage * questionsPerPage;
+    var indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+    var currentQuestions = questions.slice(indexOfFirstQuestion, indexOfLastQuestion);
+    questionItems = currentQuestions.map((question) => (
       <div key={question._id}>
         <Question question={question} changeToPage={changeToPage} />
       </div>
     ))
   }
+  const goToNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(currentPage - 1);
+  };
+
+  const isFirstPage = currentPage === 1;
+  const isLastPage = indexOfLastQuestion >= questions.length;
+
   return (
     <>
       {header}
-      <div className="content-container">{questionItems}</div>
+      <div className="content-container question-list">{questionItems}</div>
+      <div className="pagination-buttons">
+        <button className="ordering" disabled={isFirstPage} onClick={goToPreviousPage}>
+          Prev
+        </button>
+        <button className="ordering" disabled={isLastPage} onClick={goToNextPage}>
+          Next
+        </button>
+        <p>{indexOfFirstQuestion}......{indexOfLastQuestion}</p>
+      </div>
     </>
   )
 }

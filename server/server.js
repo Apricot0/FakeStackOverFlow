@@ -7,9 +7,17 @@ const PORT = 8000
 const DB_URL = 'mongodb://127.0.0.1:27017/fake_so'
 const cors = require('cors')
 const services = require('./models/services')
+const saltRounds = 10;
+const bcrypt = require('bcrypt');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+
 const Question = require('./models/questions')
 const Tag = require('./models/tags')
 const Answer = require('./models/answers')
+const User = require('./models/users')
+
+const app = express()
 
 // mongod --dbpath /mnt/c/data/db to start mongodb
 mongoose
@@ -23,11 +31,19 @@ mongoose
   .catch((error) => {
     console.log(`Error connecting to database: ${error}`)
   })
+  const store = new MongoDBStore({ uri: DB_URL});
 
-const app = express()
 app.use(express.json())
 // enable CORS
 app.use(cors())
+
+app.use(session({
+  secret: "c3627c34e68ae02a2eef4d1a8494c66fb2b570ebd49dd5e6a046754d1a91fc55",
+  store: store,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { sameSite: 'lax', maxAge: 24 * 60 * 60 * 1000 } // 1 day
+}));
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`)
@@ -175,3 +191,59 @@ app.post('/questions/postquestion', async (req, res) => {
     res.status(500).send('Internal Server Error')
   }
 })
+
+
+app.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+
+  let emailExists = await User.exists({ account_name: email });
+  if (emailExists) {
+      res.status(400).json({ message: 'Email already exists' });
+  } else {
+    // Create user
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+      if (err) return res.status(400);
+      let user = new User({
+        username: username,
+        account_name: email,
+        password: hash,
+        role: "Registered"
+      });
+      user.save();
+      res.status(200).json({ message: 'Registration successful' });
+    });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const {email, password} = req.body;
+    //Check if logged in via session
+    if (req.session.username) {
+      let user = await User.findOne({ username: req.session.username }).lean();
+      res.status(200).json({ status: 'SESSION', user: user });
+    } else {
+      console.log(email);
+      console.log(password);
+      let user = await User.findOne({account_name: email });
+      if (user == null) return res.status(400).json({ message: 'No such user' });
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err || !result) res.status(400).json({ message: 'Incorrect Password' });
+        else {
+          req.session.username = user.username;
+          console.log(req.session);
+          res.status(200).json({ user: user.username });
+        }
+      });
+    }
+  });
+
+  app.post('/logout', (req, res) => {
+    console.log(req.session);
+    if (req.session.username) {
+      req.session.destroy();
+      res.status(200).json({ status: 'OK' });
+    } else {
+      res.status(400).json({ message: 'No user to log out' });
+    }
+  });
+  

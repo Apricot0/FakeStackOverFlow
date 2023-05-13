@@ -42,7 +42,7 @@ export default function Question(props) {
       </div>
       <div className="user-container">
         <div className="askedUser">
-          {question.asked_by}
+          {question.asked_by.username}
           <span className="date">
             {' '}asked {Model.dateFormat(question.ask_date_time)}
           </span>

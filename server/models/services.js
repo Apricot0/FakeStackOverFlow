@@ -16,7 +16,7 @@ exports.getAllQuestions = async (res, ordering) => {
       break
     case 'Unanswered':
       sortQuery = { $expr: { $eq: [{ $size: '$answers' }, 0] } }
-      await Question.find(sortQuery).populate('tags').populate('answers').then((questions) => {
+      await Question.find(sortQuery).populate('tags').populate('answers').populate('asked_by', 'username').then((questions) => {
         res.status(200).send(questions)
       })
         .catch((err) => {
@@ -28,9 +28,9 @@ exports.getAllQuestions = async (res, ordering) => {
       sortQuery = { ask_date_time: -1 }
       break
   }
-  Question.find().sort(sortQuery).populate('tags').populate('answers')
+  Question.find().sort(sortQuery).populate('tags').populate('answers').populate('asked_by','username')
     .then((questions) => {
-      console.log(questions)
+      //console.log(questions)
       res.status(200).send(questions)
     })
     .catch((err) => {
