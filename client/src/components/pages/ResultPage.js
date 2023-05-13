@@ -4,27 +4,32 @@ import Question from './questionComp'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function ResultPage ({ changeToPage, list, headerName = 'Search Result' }) {
-  // const tagSideItem = document.querySelector('#tag');
-  // tagSideItem.classList.remove('active');
-  // const questionSideItem = document.querySelector('#question');
-  // questionSideItem.classList.add('active');
+export default function ResultPage({ changeToPage, list, headerName = 'Search Result' }) {
+    // const tagSideItem = document.querySelector('#tag');
+    // tagSideItem.classList.remove('active');
+    // const questionSideItem = document.querySelector('#question');
+    // questionSideItem.classList.add('active');
 
-  const [ordering, setOrdering] = useState('Newest')
-  // Create the header element
-  const handleOrderingChange = (page) => {
-    setOrdering(page)
-  }
-  const header = (
+    const [ordering, setOrdering] = useState('Newest')
+    const isLoggedIn = document.cookie.includes('isLoggedIn=true')
+    const [currentPage, setCurrentPage] = useState(1)
+    const questionsPerPage = 5
+    // Create the header element
+    const handleOrderingChange = (page) => {
+        setOrdering(page)
+    }
+    const header = (
         <div className="header">
             <div className="headerTop">
                 <div className="headerTitle">{headerName}</div>
-                <button
-                    className="headerButton"
-                    onClick={() => changeToPage('questionModal')}
-                >
-                    Ask Question
-                </button>
+                {isLoggedIn &&
+                    <button
+                        className="headerButton"
+                        onClick={() => changeToPage('questionModal')}
+                    >
+                        Ask Question
+                    </button>
+                }
             </div>
             <div className="headerBottom">
                 <div className="headerNumber">{list.length} Questions
@@ -54,34 +59,59 @@ export default function ResultPage ({ changeToPage, list, headerName = 'Search R
                 </div>
             </div>
         </div>
-  )
-  let questionItems, qList
-  if (ordering === 'Newest') {
-    qList = Model.getNewestInList(list)
-  } else if (ordering === 'Active') {
-    qList = Model.getActiveInList(list)
-  } else if (ordering === 'Unanswered') {
-    qList = Model.getUnansweredInList(list)
-  }
-  if (typeof qList === 'undefined' || qList.length === 0) {
-    questionItems = (
+    )
+    let questionItems, qList
+    if (ordering === 'Newest') {
+        qList = Model.getNewestInList(list)
+    } else if (ordering === 'Active') {
+        qList = Model.getActiveInList(list)
+    } else if (ordering === 'Unanswered') {
+        qList = Model.getUnansweredInList(list)
+    }
+    if (typeof qList === 'undefined' || qList.length === 0) {
+        questionItems = (
             <p style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '24px' }}>
                 No Questions
             </p>
-    )
-  } else {
-    questionItems = qList.map((question) => (
+        )
+    } else {
+        var indexOfLastQuestion = currentPage * questionsPerPage;
+        var indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
+        var currentQuestions = qList.slice(indexOfFirstQuestion, indexOfLastQuestion);
+        questionItems = currentQuestions.map((question) => (
             <div key={question._id}>
                 <Question question={question} changeToPage={changeToPage} />
             </div>
-    ))
-  }
-  return (
+        ))
+    }
+
+    const goToNextPage = () => {
+        setCurrentPage(currentPage + 1);
+    };
+
+    const goToPreviousPage = () => {
+        setCurrentPage(currentPage - 1);
+    };
+
+    const isFirstPage = currentPage === 1;
+    const isLastPage = indexOfLastQuestion >= qList.length;
+
+
+    return (
         <>
             {header}
-            <div className="content-container">{questionItems}</div>
+            <div className="content-container question-list">{questionItems}</div>
+            <div className="pagination-buttons">
+                <button className="ordering" disabled={isFirstPage} onClick={goToPreviousPage}>
+                    Prev
+                </button>
+                <button className="ordering" disabled={isLastPage} onClick={goToNextPage}>
+                    Next
+                </button>
+                <p>{indexOfFirstQuestion}......{indexOfLastQuestion}</p>
+            </div>
         </>
-  )
+    )
 }
 ResultPage.propTypes = {
     changeToPage: PropTypes.func,

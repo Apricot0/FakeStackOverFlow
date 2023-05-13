@@ -9,10 +9,10 @@ let Question = require('./models/questions')
 let User = require('./models/users')
 let mongoose = require('mongoose');
 
-const NUM_USERS = 20; // Number of users to generate
-const NUM_QUESTIONS_PER_USER = 5; // Number of questions to generate per user
-const NUM_ANSWERS_PER_QUESTION = 3; // Number of answers to generate per question
-const NUM_TAGS_PER_QUESTION = 3; // Number of tags to generate per question
+const NUM_USERS = 10; // Number of users to generate
+const NUM_QUESTIONS_PER_USER = 2; // Number of questions to generate per user
+const NUM_ANSWERS_PER_QUESTION = 2; // Number of answers to generate per question
+const NUM_TAGS_PER_QUESTION = 1; // Number of tags to generate per question
 
 mongoose.connect('mongodb://127.0.0.1:27017/fake_so', {useNewUrlParser: true, useUnifiedTopology: true});
 // mongoose.Promise = global.Promise;

@@ -22,6 +22,7 @@ export default function Question(props) {
       <div className="counts">
         <div className="count">{question.answers.length} answers</div>
         <div className="count">{question.views} views</div>
+        <div className="count">{question.upvote+question.downvote} votes</div>
       </div>
       <div className="question-container">
         <div

@@ -333,3 +333,20 @@ button.tag-name{
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.welcome_error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.question-list {
+  max-height: 300px; /* Adjust the height as per your design */
+  overflow: auto;
+}
+
+.pagination-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}

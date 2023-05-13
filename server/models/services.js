@@ -16,25 +16,53 @@ exports.getAllQuestions = async (res, ordering) => {
       break
     case 'Unanswered':
       sortQuery = { $expr: { $eq: [{ $size: '$answers' }, 0] } }
-      await Question.find(sortQuery).populate('tags').populate('answers').populate('asked_by', 'username').then((questions) => {
-        res.status(200).send(questions)
+      Question.find()
+      .sort(sortQuery)
+      .populate('tags')
+      .populate('answers')
+      .populate('asked_by', 'username')
+      .then((questions) => {
+        const modifiedQuestions = questions.map((question) => {
+          const modifiedQuestion = {
+            ...question._doc, // Copy the question object
+            downvote: question.downvote.length, // Replace downvote array with its count
+            upvote: question.upvote.length, // Replace upvote array with its count
+          };
+          return modifiedQuestion;
+        });
+    
+        console.log(modifiedQuestions);
+        res.status(200).send(modifiedQuestions);
       })
-        .catch((err) => {
-          console.error(err)
-          res.status(500).send('Internal Server Error')
-        })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+      });
       return
     default:
       sortQuery = { ask_date_time: -1 }
       break
   }
-  Question.find().sort(sortQuery).populate('tags').populate('answers').populate('asked_by','username')
-    .then((questions) => {
-      //console.log(questions)
-      res.status(200).send(questions)
-    })
-    .catch((err) => {
-      console.error(err)
-      res.status(500).send('Internal Server Error')
-    })
+  Question.find()
+  .sort(sortQuery)
+  .populate('tags')
+  .populate('answers')
+  .populate('asked_by', 'username')
+  .then((questions) => {
+    const modifiedQuestions = questions.map((question) => {
+      const modifiedQuestion = {
+        ...question._doc, // Copy the question object
+        downvote: question.downvote.length, // Replace downvote array with its count
+        upvote: question.upvote.length, // Replace upvote array with its count
+      };
+      return modifiedQuestion;
+    });
+
+    console.log(modifiedQuestions);
+    res.status(200).send(modifiedQuestions);
+  })
+  .catch((error) => {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  });
 }
