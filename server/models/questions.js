@@ -37,14 +37,14 @@ const questionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comment'
   }],
-  upvote: {
-    type: Number,
-    default: 0
-  },
-  downvote: {
-    type: Number,
-    default: 0
-  }
+  upvote: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  downvote: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
 })
 
 // Virtual property to return the URL for the document

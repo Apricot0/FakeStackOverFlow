@@ -82,19 +82,15 @@ const generateRandomQuestionData = (User) => {
     const asked_by = User._id;
     const tags = [tag._id];
     const views = faker.datatype.number(100);
-    const upvote = faker.datatype.number(100);
-    const downvote = faker.datatype.number(100);
     const ask_date_time = new Date(faker.date.past());
-    return {title, text, asked_by, tags, views, upvote, downvote, ask_date_time};
+    return {title, text, asked_by, tags, views, ask_date_time};
 }
 
 const generateRandomAnswerData = (User) => {
     const text = faker.lorem.paragraph();
     const ans_by = User._id;
-    const upvote = faker.datatype.number(100);
-    const downvote = faker.datatype.number(100);
     ans_date_time = new Date(faker.date.past());
-    return {text, ans_by, upvote, downvote, ans_date_time};
+    return {text, ans_by, ans_date_time};
 }
 
 const generateTestData = async () => {
