@@ -1,0 +1,335 @@
+/* Add CSS */
+:root {
+    font-family: sans-serif;
+    font-size: 16px;
+    --bgColor2: #ececec;
+    --bgColor3: #f2f3f5;
+    --bgColor1: #fefcfe;
+    --headerColor: rgb(192, 190, 190);
+    --buttonColor2: gray;
+    --bgColorPopUp: #f3f1f3;
+    --textColor: #374958;
+    --accentDark: #aeedc8;
+    --buttonColor: blue;
+    --borderColor: black;
+    --black: black;
+}
+/* css when light mode is turned on */
+body.dark {
+  --bgColor1: #15202b;
+  --bgColor2: #192734;
+  --bgColor3: #22303c;
+  --bgColorPopUp: #273746;
+  --textColor: #eaebec;
+  --accent: #2abd67;
+  --accentDark: #1f8d4d;
+  --borderColor: white;
+}
+body {
+  background-color: var(--bgColor1);
+  height: 100vh;
+  color: var(--textColor);
+  margin: 0;
+  padding: 0;
+}
+.container {
+  display: grid;
+  grid-template-rows: 200px 7fr;
+  grid-template-columns: 1fr 6fr;
+  min-width: 100vw;
+  min-height: 100vh;
+}
+.title-container{
+  grid-column: 1/-1;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  border-bottom: 1px solid var(--borderColor);
+  background-color: var(--headerColor);
+  gap:20px;
+}
+.title{
+  font-size: 30px;
+  grid-column: 2/3;
+}
+.search{
+  grid-column: 3/-1;
+}
+.sidebar{
+  border-right: 3px dotted var(--borderColor);
+  grid-row: 2/-1;
+  display:flex;
+  flex-direction: column;
+  padding-top: 30px;
+  gap:20px;
+  align-items: center;
+}
+.sideItem{
+  color: var(--buttonColor);
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.main-container{
+  display: flex;
+  flex-direction: column;
+}
+.header{
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 25px;
+  padding: 30px;
+  border-bottom: 3px dotted var(--textColor);
+  color: var(--black);
+}
+.headerTop, .headerBottom{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content:space-between;
+  align-items: center;
+  font-weight: bold;
+}
+.questionText, .headerUser, .user-container{font-weight: 400; font-size:14px;}
+.headerButton{
+  width:fit-content;
+  justify-self: end;
+  background-color: var(--buttonColor);
+  color:var(--bgColor1);
+  padding: 15px;
+  margin-right: 5rem;
+}
+.headerButton, .botButton{
+  cursor: pointer;
+}
+
+.botButton {
+  width: fit-content;
+  background-color: var(--buttonColor);
+  color: var(--bgColor1);
+  padding: 15px;
+}
+
+.headerordering{
+  display:grid;
+  justify-self: start;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.headerUser>.username{color: red;}
+.askedUser{color:red;}
+.date{color: var(--textColor);}
+.ordering{
+  border:1px solid var(--borderColor);
+  padding:5px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+.content-container{
+  display:grid;
+}
+.content{
+  padding: 30px;
+  display:grid;
+  grid-template-columns: auto 2fr 1fr;
+  gap: 5rem;
+  border-bottom: 3px dotted var(--borderColor);
+}
+.counts{
+  display:grid;
+  padding-right: 1rem;
+}
+.count{
+  color:var(--buttonColor2);
+}
+.question-container{
+  display:grid;
+  gap: 20px;
+}
+.question{
+  color:var(--buttonColor);
+}
+.question:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
+.tags{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, max-content));
+  gap: 10px;
+}
+.tag{
+  display: flex;
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: 15px;
+  color:var(--bgColor1);
+  background-color: var(--buttonColor2);
+}
+.user-container{
+  display:flex;
+}
+
+/*answer styles*/
+.headerQuestion, .headerQuestion{
+  display: grid;
+  grid-template-columns: .5fr 3.5fr 1fr;
+  gap: 30px;
+  justify-content:space-between;
+  align-items: center;
+  font-weight: bold;
+}
+.answer{
+  display: grid; 
+  grid-template-columns: 4fr 1fr;
+  gap: 30px;
+  /* this is connected to header bottom to align */
+  padding: 30px;
+  color: var(--black);
+  border-bottom: 3px dotted var(--borderColor);
+}
+.answer>.user-container{display: block;}
+.user-container>.username{color:green;}
+#postAnswer{
+  justify-self: start;
+  margin: 20px;
+}
+/*form */
+form{align-self: center; justify-self: center;}
+.form-container{
+  display:grid;
+  gap: 15px;
+  margin-top: 20px;
+  justify-items: center;
+}
+.input{ 
+  width: 400px; 
+  display: grid;
+  gap: 5px;
+}
+input:focus{
+    border: 3px solid blue;
+    box-shadow: 0 0 1px 1px black;
+}
+.input>input:invalid, .input>textarea:invalid{
+    border: 3px solid rgb(255, 0, 0);
+}
+#password:invalid+ span::before{
+    content:"*Passwords do not match";
+    color:red;
+    font-size: 1rem;
+}
+input,
+textarea,
+fieldset {
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #333;
+  box-sizing: border-box;
+  appearance: none;
+}
+textarea#input_text {
+  width: 100%;
+  height: 200px;
+  resize: none;
+  resize: none;
+}
+
+label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+input#search {
+  margin-right: 50px;
+  width: 200;
+}
+
+p.mustfillHint {
+  color: red;
+}
+
+.tagHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+  padding: 39px 35px;
+  flex-direction: row;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.left-head, .right-head {
+  display: flex;
+  align-items: center;
+}
+
+.head-span{
+  margin-right:10px;
+}
+
+.tag-box {
+    border: 3px dotted var(--borderColor);
+    /* //display: inline-block; */
+    width: 150px;
+    height: 100px;
+    padding: 10px;
+    justify-content: center;
+}
+
+.tagContainer{
+  padding-top: 100px;
+  padding-left: 50px;
+  display: grid;
+  /* grid-template-columns: repeat(auto-fit, minmax(12rem,max-content)); */
+  grid-template-columns: 250px 250px 250px;
+  gap: 60px;
+  grid-auto-rows: auto;
+}
+
+/* .tag-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+} */
+
+.tag-name {
+    font-weight: bold;
+}
+
+.tag-link {
+    text-decoration: none;
+}
+.sideItem.active {
+  background-color: var(--headerColor);
+  border-radius: 10px;
+}
+.ordering {
+  cursor: pointer;
+}
+
+button.tag-name{
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.welcome_page {
+  margin-top: 100px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 100px;
+  text-align: center;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
