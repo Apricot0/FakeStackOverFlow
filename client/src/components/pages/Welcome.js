@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios'
 import FakeStackOverflow from '../fakestackoverflow.js'
 
+axios.defaults.withCredentials = true;
+
 export default function Welcome() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -79,6 +81,7 @@ export default function Welcome() {
 
             // Assuming the server returns a success status
             if (response.status === 200) {
+                console.log(response)
                 document.cookie = "isLoggedIn=true";
                 setIsLoggedIn(true);
                 setErrorMessage('Login successful');

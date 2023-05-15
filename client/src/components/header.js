@@ -7,6 +7,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
+axios.defaults.withCredentials = true;
+
 export default function Header ({ changeToPage }) {
   const [searchValue, setSearchValue] = useState('')
   const isLoggedIn = document.cookie.includes('isLoggedIn=true');
@@ -34,6 +36,7 @@ export default function Header ({ changeToPage }) {
     document.cookie = 'isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     axios.post('http://localhost:8000/logout')
       .then(res => {
+        console.log(res);
         if (res.status === 200) {
           window.location.href = '/';
         } else setErrorMessage('Logout failed due to server error. Please try again.');

@@ -33,9 +33,9 @@ mongoose
   })
   const store = new MongoDBStore({ uri: DB_URL});
 
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json())
 // enable CORS
-app.use(cors())
 
 app.use(session({
   secret: "c3627c34e68ae02a2eef4d1a8494c66fb2b570ebd49dd5e6a046754d1a91fc55",
