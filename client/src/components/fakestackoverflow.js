@@ -7,6 +7,7 @@ import QuestionModal from './pages/QuestionModal'
 import AnswerModal from './pages/AnswerModal'
 import TagsPage from './pages/TagsPage'
 import ResultPage from './pages/ResultPage.js'
+import ProfilePage from './pages/profilePage.js'  
 
 let hn
 
@@ -77,6 +78,10 @@ export default class FakeStackOverflow extends React.Component {
           list={list}
           headerName={headerName}
         />
+      )
+    } else if (this.state.currentPage === 'profilePage') {
+      pageToRender = (
+        <ProfilePage changeToPage={this.handlePageChange} />
       )
     }
 

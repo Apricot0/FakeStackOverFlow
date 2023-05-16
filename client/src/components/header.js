@@ -50,6 +50,7 @@ export default function Header ({ changeToPage }) {
       <div className="title">Fake Stack Overflow</div>
       <input type="search" name="search" id="search" placeholder="Search . . ." value={searchValue} onChange={handleSearchChange} onKeyDown={searchResult} />
       {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
+      {isLoggedIn && <button onClick={() => changeToPage('profilePage')}>My Profile</button>}
       {isLoggedIn && <p>Hello, {document.cookie.split(';').find(cookie => cookie.trim().startsWith('username=')).split('=')[1]} </p>}
       {errorMessage && <div className="error-message">{errorMessage}</div>}
     </div>

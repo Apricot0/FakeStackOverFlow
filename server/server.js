@@ -139,7 +139,26 @@ app.get('/questions/tags/:tagId', async (req, res) => {
 
 app.get('/userprofile', async (req, res) => {
   try {
-    //todo
+    const { account_name } = req.session;
+    console.log(account_name)
+    const user = await User.findOne({account_name: account_name}).populate({
+      path: 'questions',
+      populate: [{
+        path: 'tags',
+        model: Tag,
+        
+      },{
+        path: 'asked_by',
+        model: User
+      }
+    ]
+    })
+    .populate("answers")
+    console.log(user)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    res.status(200).send(user)
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: 'Internal Server Error' })
@@ -211,7 +230,7 @@ app.post('/questions/postquestion', async (req, res) => {
     await user.save();
 
     res.sendStatus(200)
-  } catch (err) {
+  } catch (err) { 
     console.error(err)
     res.status(500).send('Internal Server Error')
   }
