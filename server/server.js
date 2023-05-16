@@ -137,6 +137,16 @@ app.get('/questions/tags/:tagId', async (req, res) => {
   }
 })
 
+app.get('/userprofile', async (req, res) => {
+  try {
+    //todo
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Internal Server Error' })
+  }
+})
+
+
 app.post('/questions/:id/postAnswer', async (req, res) => {
   console.log(req.params.id)
   const questionId = req.params.id
