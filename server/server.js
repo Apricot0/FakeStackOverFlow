@@ -164,12 +164,21 @@ app.post('/questions/:id/postAnswer', async (req, res) => {
   }
 })
 app.post('/questions/postquestion', async (req, res) => {
-  const { title, text, tags, askedBy } = req.body
+  const { title, summary, text, tags } = req.body
   try {
+    console.log("post question session:", req.session)
+    account_name = req.session.account_name
+    console.log(account_name)
+    const user = await User.findOne({ account_name: account_name })
+    console.log("user find:", user)
     const savedTags = []
     for (const tagName of tags) {
       const iftag = await Tag.find({ name: tagName })
       if (iftag.length === 0) {
+        //user can not create tag if reputation is less than 50
+        if(user.reputation < 50) {
+          return res.status(403).json({ message: 'You do not have enough reputation to create a new tag' })
+        }
         const tag = new Tag({ name: tagName })
         const newTag = await tag.save()
         savedTags.push(newTag)
@@ -177,14 +186,20 @@ app.post('/questions/postquestion', async (req, res) => {
         savedTags.push(iftag[0])
       }
     }
-    console.log(savedTags)
+    //console.log(savedTags)
+    console.log(user)
     const newQuestion = await new Question({
       title,
+      summary,
       text,
       tags: savedTags,
-      asked_by: askedBy
+      asked_by: user._id
     })
     await newQuestion.save()
+
+    user.questions.push(newQuestion);
+    await user.save();
+
     res.sendStatus(200)
   } catch (err) {
     console.error(err)
@@ -218,11 +233,12 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
   const {email, password} = req.body;
     //Check if logged in via session
-    if (req.session.username) {
-      let user = await User.findOne({ username: req.session.username }).lean();
-      res.status(200).json({ status: 'SESSION', user: user });
+    if (req.session.account_name) {
+      let user = await User.findOne({ account_name: req.session.account_name }).lean();
+      res.status(200).json({ status: 'SESSION', user: user.username });
     } else {
-      console.log(email);
+      if (email == null) return res.status(200).json({ message: 'waiting for login' });
+      console.log(email); 
       console.log(password);
       let user = await User.findOne({account_name: email });
       if (user == null) return res.status(400).json({ message: 'No such user' });
@@ -230,6 +246,7 @@ app.post('/login', async (req, res) => {
         if (err || !result) res.status(400).json({ message: 'Incorrect Password' });
         else {
           req.session.username = user.username;
+          req.session.account_name = user.account_name;
           console.log(req.session);
           res.status(200).json({ user: user.username });
         }
@@ -239,7 +256,7 @@ app.post('/login', async (req, res) => {
 
   app.post('/logout', (req, res) => {
     console.log(req.session);
-    if (req.session.username) {
+    if (req.session.account_name) {
       req.session.destroy();
       res.status(200).json({ status: 'OK' });
     } else {

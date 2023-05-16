@@ -31,7 +31,7 @@ exports.getAllQuestions = async (res, ordering) => {
           return modifiedQuestion;
         });
     
-        console.log(modifiedQuestions);
+        //console.log(modifiedQuestions);
         res.status(200).send(modifiedQuestions);
       })
       .catch((error) => {
@@ -58,7 +58,7 @@ exports.getAllQuestions = async (res, ordering) => {
       return modifiedQuestion;
     });
 
-    console.log(modifiedQuestions);
+    //console.log(modifiedQuestions);
     res.status(200).send(modifiedQuestions);
   })
   .catch((error) => {

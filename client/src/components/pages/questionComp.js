@@ -36,6 +36,9 @@ export default function Question(props) {
           }
         >
           {question.title}
+          <p className='question_summary'>
+            {question.summary}
+          </p>
         </div>
         <div className="tags">
           {tagItems}
@@ -68,7 +71,10 @@ Question.propTypes = {
       ans_by: PropTypes.string.isRequired,
       ans_date_time: PropTypes.string.isRequired
     })).isRequired,
-    asked_by: PropTypes.string.isRequired,
+    asked_by: PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+    }).isRequired,
     ask_date_time: PropTypes.string.isRequired,
     views: PropTypes.number.isRequired
   }).isRequired

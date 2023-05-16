@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
 import FakeStackOverflow from '../fakestackoverflow.js'
 
@@ -13,6 +13,14 @@ export default function Welcome() {
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    useEffect(() => {
+        axios.post('http://localhost:8000/login')
+          .then(res => {
+            if (res.data.status === 'SESSION')
+            setIsLoggedIn(true);
+            console.log("from welcome",res);
+          }); // eslint-disable-next-line
+      }, []);
 
     const handleRegister = async () => {
         console.log('Registering user...');
@@ -26,13 +34,19 @@ export default function Welcome() {
             return;
         }
 
+        // Check if the password contains the username or email
+        if (password.includes(username) || password.includes(email)) {
+            setErrorMessage('Password should not contain the username or email');
+            return;
+        }
+
         //Check if the email has a valid format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-             setErrorMessage('Invalid email format');
-             // Show feedback to the user
+            setErrorMessage('Invalid email format');
+            // Show feedback to the user
             return;
-         }
+        }
         try {
             const response = await axios.post('http://localhost:8000/register', {
                 username,
@@ -70,8 +84,8 @@ export default function Welcome() {
         // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         // if (!emailRegex.test(email)) {
         //    setErrorMessage('Invalid email format');
-            // Show feedback to the user
-         //   return;
+        // Show feedback to the user
+        //   return;
         //}
         try {
             const response = await axios.post('http://localhost:8000/login', {
@@ -83,6 +97,8 @@ export default function Welcome() {
             if (response.status === 200) {
                 console.log(response)
                 document.cookie = "isLoggedIn=true";
+                console.log(response.data.user);
+                document.cookie = "username=" + response.data.user;
                 setIsLoggedIn(true);
                 setErrorMessage('Login successful');
                 // Redirect to the login page or home page

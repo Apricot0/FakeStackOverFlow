@@ -33,11 +33,12 @@ export default function Header ({ changeToPage }) {
   function handleLogout() {
     // Clear the login cookie and redirect to the login page
     setErrorMessage('');
-    document.cookie = 'isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     axios.post('http://localhost:8000/logout')
       .then(res => {
         console.log(res);
         if (res.status === 200) {
+          document.cookie = 'isLoggedIn=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+          document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
           window.location.href = '/';
         } else setErrorMessage('Logout failed due to server error. Please try again.');
       });
@@ -49,6 +50,7 @@ export default function Header ({ changeToPage }) {
       <div className="title">Fake Stack Overflow</div>
       <input type="search" name="search" id="search" placeholder="Search . . ." value={searchValue} onChange={handleSearchChange} onKeyDown={searchResult} />
       {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
+      {isLoggedIn && <p>Hello, {document.cookie.split(';').find(cookie => cookie.trim().startsWith('username=')).split('=')[1]} </p>}
       {errorMessage && <div className="error-message">{errorMessage}</div>}
     </div>
     

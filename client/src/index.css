@@ -350,3 +350,8 @@ button.tag-name{
   justify-content: center;
   margin-top: 20px;
 }
+
+.question_summary{
+  font-size: 13px;
+  font-style: italic;
+}

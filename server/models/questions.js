@@ -4,8 +4,12 @@ const mongoose = require('mongoose')
 const questionSchema = new mongoose.Schema({
   title: {
     type: String,
-    maxlength: 100,
+    maxlength: 50,
     required: true
+  },
+  summary: {
+    type: String,
+    maxlength: 140,
   },
   text: {
     type: String,

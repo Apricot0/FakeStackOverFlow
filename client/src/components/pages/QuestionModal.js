@@ -1,10 +1,17 @@
 // import Model from '../../models/model'
 import axios from 'axios'
-// import { useState } from "react";
+import { useState } from "react";
 import React from 'react'
 import PropTypes from 'prop-types'
 
+axios.defaults.withCredentials = true;
+
 export default function QuestionModal({ changeToPage }) {
+
+
+  const [errorMessage, setErrorMessage] = useState('');
+
+
   const handleTitleInput = (event) => {
     const value = event.target.value.trim()
     if (value.length === 0 || /^\s*$/.test(value)) {
@@ -14,6 +21,10 @@ export default function QuestionModal({ changeToPage }) {
     } else {
       event.target.setCustomValidity('')
     }
+  }
+
+  const handleSummaryInput = (event) => {
+    event.target.setCustomValidity('')
   }
   const handleTagInput = (event) => {
     const tagString = event.target.value.trim()
@@ -67,23 +78,31 @@ export default function QuestionModal({ changeToPage }) {
     event.preventDefault()
     const form = event.target
     const title = form.elements['question-title'].value.trim()
+    const summary = form.elements['question-summary'].value.trim()
     const text = form.elements.input_text.value.trim()
     const tagsInput = form.elements.tags.value.trim()
     const tags = tagsInput.split(/\s+/)
     console.log(tags)
-    const username = form.elements.username.value.trim()
+    //const username = form.elements.username.value.trim()
     axios.post('http://localhost:8000/questions/postquestion', {
       title,
+      summary,
       text,
       tags,
-      askedBy: username
+      //askedBy: username
     }).then(() => {
       // form.reset();
       console.log('hi')
       changeToPage('questionPage')
     })
       .catch((error) => {
-        console.error(error)
+        if (error.response && error.response.data && error.response.data.message) {
+          setErrorMessage(`Post failed: ${error.response.data.message}`);
+          console.error(error.response.data.message)
+        }else{
+          setErrorMessage("Error due to server: ", error.status)
+        }
+
       })
 
     // add question and add tag
@@ -97,14 +116,26 @@ export default function QuestionModal({ changeToPage }) {
       <div className="form-container">
         <div className="input">
           <label htmlFor="question-title">Question Title*</label>
-          <em>Limit text to 100 characters or less</em>
+          <em>Limit text to 50 characters or less</em>
           <input
             type="text"
             name="question-title"
             id="question-title"
-            maxLength={100}
+            maxLength={50}
             required
             onInput={handleTitleInput}
+          />
+        </div >
+        <div className="input">
+        <label htmlFor="question-summary">Question Summary*</label>
+          <em>Limit text to 140 characters or less</em>
+          <input
+            type="text"
+            name="question-summary"
+            id="question-summary"
+            maxLength={140}
+            required
+            onInput={handleSummaryInput}
           />
         </div>
         <div className="input">
@@ -129,6 +160,7 @@ export default function QuestionModal({ changeToPage }) {
             onInput={handleTagInput}
           />
         </div>
+        {/*
         <div className="input">
           <label htmlFor="username">Username*</label>
           <input
@@ -139,14 +171,16 @@ export default function QuestionModal({ changeToPage }) {
             required
           />
         </div>
+        */}
         <div>
           <button type="submit" className="botButton">
             Post Question
           </button>
           <p className="mustfillHint">*indicates mandatory fields</p>
         </div>
+        <p className='welcome_error'>{errorMessage}</p>
       </div>
-    </form>
+    </form >
   )
 }
 QuestionModal.propTypes = {
