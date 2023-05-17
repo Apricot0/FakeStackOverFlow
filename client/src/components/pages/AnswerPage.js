@@ -163,6 +163,8 @@ export default function AnswerPage({ changeToPage, question_in }) {
       indexOfFirstComment,
       indexOfLastComment
     );
+    // const response = await axios.get(`http://localhost:8000/comments/${com._id}`);
+    //       const real = response.data;
     commentItems = currentComments.map((comment) => (
       <div key={comment._id}>
         <Comment com={comment} />

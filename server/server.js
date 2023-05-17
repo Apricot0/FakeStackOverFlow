@@ -277,7 +277,8 @@ app.post("/questions/:id/postAnswer", async (req, res) => {
     const populatedQuestion = await Question.findById(savedQuestion._id)
       .populate("asked_by")
       .populate("tags")
-      .populate("answers");
+      .populate("answers")
+      .populate("comments");
     res.status(201).json(populatedQuestion);
     console.log(populatedQuestion);
   } catch (err) {

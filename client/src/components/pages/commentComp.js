@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 
 export default function Comment (props) {
     const { com } = props
+    console.log(com);
   // const real = await axios.get(`http://localhost:8000/answers/${ans._id}`);
     // console.log(ans);
     const [comment, setCurrentComment] = useState(com);

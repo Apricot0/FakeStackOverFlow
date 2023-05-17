@@ -402,7 +402,7 @@ button.tag-name{
 }
 .newAnswer{
   border-bottom: 3px dotted var(--borderColor);
-  background-color: rgb(227, 226, 226);
+  background-color: rgb(241, 239, 239);
   display:grid;
 }
 #answerInput{
