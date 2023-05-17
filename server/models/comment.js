@@ -11,6 +11,10 @@ const commentSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  upvote: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   ans_date_time: {
     type: Date,
     default: Date.now

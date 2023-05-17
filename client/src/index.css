@@ -190,7 +190,7 @@ body {
   /* this is connected to header bottom to align */
   padding: 30px;
   color: var(--black);
-  border-bottom: 3px dotted var(--borderColor);
+  
 }
 .answer>.user-container{display: block;}
 .user-container>.username{color:green;}
@@ -395,4 +395,17 @@ button.tag-name{
 .small{
   font-size: 13px;
   color: blue;
+}
+.smaller{
+  width: 30px;
+  height: 30px;
+}
+.newAnswer{
+  border-bottom: 3px dotted var(--borderColor);
+  background-color: rgb(227, 226, 226);
+  display:grid;
+}
+#answerInput{
+  width: 500px;
+  justify-self: center;
 }

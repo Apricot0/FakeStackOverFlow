@@ -1,6 +1,7 @@
 import Model from "../../models/model";
 import { useState } from "react";
 import Answer from "./answerComp";
+import Comment from "./commentComp";
 import React from "react";
 import axios from 'axios'
 import PropTypes from "prop-types";
@@ -9,6 +10,7 @@ import PropTypes from "prop-types";
 
 export default function AnswerPage({ changeToPage, question_in }) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage2, setCurrentPage2] = useState(1);
   const answersPerPage = 5;
   // const [reputationError, setReputationError] = useState(false);
   //const [voteStatus, setVoteStatus] = useState('');
@@ -136,15 +138,93 @@ export default function AnswerPage({ changeToPage, question_in }) {
   const goToPreviousPage = () => {
     setCurrentPage(currentPage - 1);
   };
-
   const isFirstPage = currentPage === 1;
   const isLastPage = indexOfLastAnswer >= question.answers.length;
 
+
+  
+  const commentsPerPage =3;
+  let commentItems; // question will changes based on amount.
+  //  if (typeof questions == "undefined" || questions.length == 0) {
+  if (question.comments.length === 0) {
+    commentItems = (
+      <p style={{ textAlign: "center", fontWeight: "bold", fontSize: "24px" }}>
+        No Comments
+      </p>
+    );
+  } else {
+    // console.log(questions);
+    var indexOfLastComment = currentPage2 * commentsPerPage;
+    var indexOfFirstComment = indexOfLastComment - commentsPerPage;
+    var currentComments = question.comments.slice(
+      indexOfFirstComment,
+      indexOfLastComment
+    );
+    commentItems = currentComments.map((comment) => (
+      <div key={comment._id}>
+        <Comment com={comment} />
+      </div>
+    ));
+  }
+  const IFP = currentPage2 === 1; //isFirstPage
+  const ILP = indexOfLastComment >= question.comments.length; //isLastPage
+  const goToNextPage2 = () => {
+    setCurrentPage2(currentPage2 + 1);
+  };
+
+  const goToPreviousPage2 = () => {
+    setCurrentPage2(currentPage2 - 1);
+  };
+
+  async function handleCommentSubmit(event) {
+    if (event.key === 'Enter') {
+      const commentText = event.target.value;
+      const trimmedComment = commentText.trim();
+      if (trimmedComment.length < 0 || trimmedComment.length > 140) {
+        alert("Must be less than 140 characters");
+        return;
+      }
+      const qstnId = question._id; // Replace with the actual question ID
+      axios
+        .post(`http://localhost:8000/question/${qstnId}/postcomment`, { text: commentText })
+        .then((response) => {
+          // Handle the response here
+          console.log(response.data);
+          if (response.data.status === 'SUCCESS') {
+            axios.get(`http://localhost:8000/questions/${question._id}`).then((res)=>{
+              setCurrentQuestion(res.data);
+           })
+          } else if(response.data.status === "LOW-REPUTATION"){
+            alert("Your reputation must be 50 or higher to comment!");
+          }
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+      // Clear the input field
+      event.target.value = '';
+    }
+  }
+
   return (
     <>
-      
       {header}
       <div className="content-container">
+        {commentItems}
+        <div className="pagination-buttons">
+        <button className="ordering" disabled={IFP} onClick={goToPreviousPage2}>
+          Prev
+        </button>
+        <button className="ordering" disabled={ILP} onClick={goToNextPage2}>
+          Next
+        </button>
+        <p>{indexOfFirstComment}......{indexOfLastComment}</p>
+      </div>
+      <input
+      type="text"
+      placeholder="Enter your comment"
+      onKeyUp={handleCommentSubmit}
+    />
         {answerItems}
         <div className="pagination-buttons">
         <button className="ordering" disabled={isFirstPage} onClick={goToPreviousPage}>
