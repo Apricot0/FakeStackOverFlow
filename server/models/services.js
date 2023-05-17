@@ -21,6 +21,7 @@ exports.getAllQuestions = async (res, ordering) => {
       .populate('tags')
       .populate('answers')
       .populate('asked_by', 'username')
+      .populate('comments')
       .then((questions) => {
         const modifiedQuestions = questions.map((question) => {
           const modifiedQuestion = {
@@ -48,6 +49,7 @@ exports.getAllQuestions = async (res, ordering) => {
   .populate('tags')
   .populate('answers')
   .populate('asked_by', 'username')
+  .populate('comments')
   .then((questions) => {
     const modifiedQuestions = questions.map((question) => {
       const modifiedQuestion = {
