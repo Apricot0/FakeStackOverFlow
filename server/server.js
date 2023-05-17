@@ -377,17 +377,76 @@ app.post("/question/:qstnId/vote", async function (req, res) {
   }
 });
 
+app.post("/answer/:ansId/vote", async function (req, res) {
+  try {
+    if (req.session.username) {
+      const ansId = req.params.ansId;
+      const result = await Answer.findById(ansId).exec(); //answer
+      
+      if (!result) {
+        return res.json({ status: "FAIL" });
+      }
+
+      const user = await User.findOne({ username: req.session.username }).exec();
+      const uid = user._id; // Person who is voting
+
+      // if (!user || user.reputation < 50) {
+      //   return res.json({ status: "LOW-REPUTATION" });
+      // }
+
+      const userWhoPosted = await User.findOne({ answers: ansId }).exec();
+      
+      if (!userWhoPosted) {
+        return res.json({ status: "FAIL" });
+      }
+
+      if (req.body.op === "upvote") {
+        if (result.downvote.includes(uid.toString())) {
+          userWhoPosted.reputation += 15;
+          result.downvote = result.downvote.filter((e) => e.toString() !== uid.toString());
+        }
+        if (!result.upvote.includes(uid.toString())) {
+            result.upvote.push(uid);
+            userWhoPosted.reputation += 15;
+          }
+      }
+      else if (req.body.op === "downvote") {
+      if (result.upvote.includes(uid.toString())) {
+        userWhoPosted.reputation += 15;
+        result.upvote = result.upvote.filter((e) => e.toString() !== uid.toString());
+      }
+      if (!result.downvote.includes(uid.toString())) {
+          result.downvote.push(uid);
+          userWhoPosted.reputation += 15;
+        }
+      }
+    }
+      else {
+        return res.json({ status: "FAIL" });
+      }
+      await userWhoPosted.save();
+      await result.save();
+      return res.json({ status: "SUCCESS" });
+    }
+    catch (error) {
+    console.error(error);
+    return res.json({ status: "FAIL" });
+  }
+});
+
 // app.post("/answer/:ansId/vote", async function (req, res) {
 //   try {
 //     if (req.session.username) {
 //       const ansId = req.params.ansId;
+
 //       const result = await Answer.findById(ansId).exec();
-      
 //       if (!result) {
 //         return res.json({ status: "FAIL" });
 //       }
 
-//       const user = await User.findOne({ username: req.session.username }).exec();
+//       const user = await User.findOne({
+//         username: req.session.username,
+//       }).exec();
 //       const uid = user._id; // Person who is voting
 
 //       // if (!user || user.reputation < 50) {
@@ -395,38 +454,38 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //       // }
 
 //       const userWhoPosted = await User.findOne({ answers: ansId }).exec();
-      
 //       if (!userWhoPosted) {
 //         return res.json({ status: "FAIL" });
 //       }
 
 //       if (req.body.op === "upvote") {
-//         if (!result.upvote.includes(uid.toString())) {
-//           if (req.body.switch) {
-//             // Switching from downvote to upvote
-//             if (result.downvote.includes(uid.toString())) {
-//               userWhoPosted.reputation += 15;
-//               result.downvote = result.downvote.filter((e) => e.toString() !== uid.toString());
-//             }
-//           } else {
-//             // Upvote the answer
-//             userWhoPosted.reputation += 5;
-//             result.upvote.push(uid);
-//           }
+//         // Switching from up to downvote and vice versa
+//         if (req.body.switch) {
+//           userWhoPosted.reputation += 10;
+//           result.downvote = result.downvote.filter((e) => e !== uid);
+//         }
+
+//         if (result.upvote.indexOf(uid) === -1) {
+//           userWhoPosted.reputation += 5;
+//           result.upvote.push(uid);
+//         } else {
+//           // If already upvoted, remove upvote
+//           userWhoPosted.reputation -= 5;
+//           result.upvote = result.upvote.filter((e) => e !== uid);
 //         }
 //       } else if (req.body.op === "downvote") {
-//         if (!result.downvote.includes(uid.toString())) {
-//           if (req.body.switch) {
-//             // Switching from upvote to downvote
-//             if (result.upvote.includes(uid.toString())) {
-//               userWhoPosted.reputation -= 15;
-//               result.upvote = result.upvote.filter((e) => e.toString() !== uid.toString());
-//             }
-//           } else {
-//             // Downvote the answer
-//             userWhoPosted.reputation -= 10;
-//             result.downvote.push(uid);
-//           }
+//         if (req.body.switch) {
+//           userWhoPosted.reputation -= 5;
+//           result.upvote = result.upvote.filter((e) => e !== uid);
+//         }
+
+//         if (result.downvote.indexOf(uid) === -1) {
+//           userWhoPosted.reputation -= 10;
+//           result.downvote.push(uid);
+//         } else {
+//           // If already downvoted, remove downvote
+//           userWhoPosted.reputation += 10;
+//           result.downvote = result.downvote.filter((e) => e !== uid);
 //         }
 //       } else {
 //         return res.json({ status: "FAIL" });
@@ -443,72 +502,3 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //     return res.json({ status: "FAIL" });
 //   }
 // });
-
-app.post("/answer/:ansId/vote", async function (req, res) {
-  try {
-    if (req.session.username) {
-      const ansId = req.params.ansId;
-
-      const result = await Answer.findById(ansId).exec();
-      if (!result) {
-        return res.json({ status: "FAIL" });
-      }
-
-      const user = await User.findOne({
-        username: req.session.username,
-      }).exec();
-      const uid = user._id; // Person who is voting
-
-      // if (!user || user.reputation < 50) {
-      //   return res.json({ status: "LOW-REPUTATION" });
-      // }
-
-      const userWhoPosted = await User.findOne({ answers: ansId }).exec();
-      if (!userWhoPosted) {
-        return res.json({ status: "FAIL" });
-      }
-
-      if (req.body.op === "upvote") {
-        // Switching from up to downvote and vice versa
-        if (req.body.switch) {
-          userWhoPosted.reputation += 10;
-          result.downvote = result.downvote.filter((e) => e !== uid);
-        }
-
-        if (result.upvote.indexOf(uid) === -1) {
-          userWhoPosted.reputation += 5;
-          result.upvote.push(uid);
-        } else {
-          // If already upvoted, remove upvote
-          userWhoPosted.reputation -= 5;
-          result.upvote = result.upvote.filter((e) => e !== uid);
-        }
-      } else if (req.body.op === "downvote") {
-        if (req.body.switch) {
-          userWhoPosted.reputation -= 5;
-          result.upvote = result.upvote.filter((e) => e !== uid);
-        }
-
-        if (result.downvote.indexOf(uid) === -1) {
-          userWhoPosted.reputation -= 10;
-          result.downvote.push(uid);
-        } else {
-          // If already downvoted, remove downvote
-          userWhoPosted.reputation += 10;
-          result.downvote = result.downvote.filter((e) => e !== uid);
-        }
-      } else {
-        return res.json({ status: "FAIL" });
-      }
-
-      await userWhoPosted.save();
-      await result.save();
-      return res.json({ status: "SUCCESS" });
-    } else {
-      return res.json({ status: "FAIL" });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.json({ status: "FAIL" });
-  }
-});

@@ -35,6 +35,7 @@ export default function Answer (props) {
     })
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/answers/${answer._id}`);
+        console.log(res.data);
         setCurrentAnswer(res.data);
       } else if(response.data.status === "LOW-REPUTATION"){
         alert("Your reputation must be 50 or higher to vote!");
