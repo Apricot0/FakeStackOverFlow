@@ -23,7 +23,7 @@ export default function Answer (props) {
         }
       };
       fetchData();
-    }, []);
+    }, [ans._id]);
   useEffect(() => {
     setCurrentAnswer(answer);
   }, [answer]);

@@ -96,8 +96,8 @@ app.get("/questions/:id", (req, res) => {
     .then((question) => {
       const modifiedQuestion = {
         ...question._doc, // Copy the question object
-        downvote: question.downvote.length, // Replace downvote array with its count
-        upvote: question.upvote.length, // Replace upvote array with its count
+        //downvote: question.downvote.length, // Replace downvote array with its count
+        //upvote: question.upvote.length, // Replace upvote array with its count
       };
       res.status(200).send(modifiedQuestion);
     })
@@ -131,6 +131,60 @@ app.get("/tags", (req, res) => {
     .catch((err) => {
       console.error(err);
       res.status(500).send("Internal Server Error");
+    });
+});
+
+app.get("/mytags", async (req, res) => {
+  const user = await User.findOne({ account_name: req.session.account_name })
+  console.log(user)
+  Question.find({ asked_by: user._id })
+    .populate('tags') // Populate the 'tags' field of the questions with only the 'name' property
+    .exec()
+    .then((questions) => {
+      // Create a Set to store the unique tags
+      const uniqueTags = new Set();
+
+      // Loop through the questions and retrieve the tags
+      questions.forEach((question) => {
+        question.tags.forEach((tag) => {
+          uniqueTags.add(tag._id);
+        });
+      });
+
+      // Convert the Set to an array
+      const combinedTags = Array.from(uniqueTags);
+      console.log(combinedTags);
+
+      Tag.aggregate([
+        {
+            $match: {
+              _id: { $in: combinedTags },
+            },
+          },
+          {
+            $lookup: {
+              from: "questions",
+              localField: "_id",
+              foreignField: "tags",
+              as: "questions",
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              questionCount: { $size: "$questions" },
+            },
+          },
+      ])
+        .then((tags) => {
+          // console.log(tags);
+          res.status(200).send(tags);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send("Internal Server Error");
+        });
     });
 });
 // put is for updating. updates views.
@@ -170,19 +224,19 @@ app.get("/userprofile", async (req, res) => {
   try {
     const { account_name } = req.session;
     console.log(account_name)
-    const user = await User.findOne({account_name: account_name}).populate({
+    const user = await User.findOne({ account_name: account_name }).populate({
       path: 'questions',
       populate: [{
         path: 'tags',
         model: Tag,
-        
-      },{
+
+      }, {
         path: 'asked_by',
         model: User
       }
-    ]
+      ]
     })
-    .populate("answers")
+      .populate("answers")
     console.log(user)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -199,7 +253,7 @@ app.post("/questions/:id/postAnswer", async (req, res) => {
   account_name = req.session.account_name;
   const user = await User.findOne({ account_name: account_name });
   const questionId = req.params.id;
-  const {inputText } = req.body;
+  const { inputText } = req.body;
   console.log(inputText);
   try {
     const question = await Question.findById(questionId);
@@ -212,7 +266,7 @@ app.post("/questions/:id/postAnswer", async (req, res) => {
     question.answers.push(savedAnswer);
     const savedQuestion = await question.save();
     const populatedQuestion = await Question.findById(savedQuestion._id)
-    .populate("asked_by")
+      .populate("asked_by")
       .populate("tags")
       .populate("answers");
     res.status(201).json(populatedQuestion);
@@ -264,7 +318,7 @@ app.post("/questions/postquestion", async (req, res) => {
     await user.save();
 
     res.sendStatus(200);
-  } catch (err) { 
+  } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");
   }
@@ -360,32 +414,32 @@ app.post("/question/:qstnId/vote", async function (req, res) {
       if (req.body.op === "upvote") {
         // Switching from up to downvote and vice versa
         //if (req.body.switch) {
-          user.reputation += 5;
-          result.downvote = result.downvote.filter((e) => !e.equals(uid));
-          console.log("upvote result", result)
+        user.reputation += 5;
+        result.downvote = result.downvote.filter((e) => !e.equals(uid));
+        console.log("upvote result", result)
         //}
 
         if (result.upvote.indexOf(uid) === -1) {
           //userWhoPosted.reputation += 5;
           result.upvote.push(uid);
-        } 
+        }
         //else {
-          // If already upvoted, remove upvote
+        // If already upvoted, remove upvote
         //  userWhoPosted.reputation -= 10;
         //  result.upvote = result.upvote.filter((e) => e !== uid);
         //}
       } else if (req.body.op === "downvote") {
         //if (req.body.switch) {
-          user.reputation -= 10;
-          result.upvote = result.upvote.filter((e) => !e.equals(uid));
+        user.reputation -= 10;
+        result.upvote = result.upvote.filter((e) => !e.equals(uid));
         //}
 
         if (result.downvote.indexOf(uid) === -1) {
-        //  userWhoPosted.reputation -= 10;
+          //  userWhoPosted.reputation -= 10;
           result.downvote.push(uid);
-        } 
+        }
         //else {
-          // If already downvoted, remove downvote
+        // If already downvoted, remove downvote
         //  userWhoPosted.reputation += 5;
         //  result.downvote = result.downvote.filter((e) => e !== uid);
         //}
@@ -412,7 +466,7 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //     if (req.session.username) {
 //       const ansId = req.params.ansId;
 //       const result = await Answer.findById(ansId).exec();
-      
+
 //       if (!result) {
 //         return res.json({ status: "FAIL" });
 //       }
@@ -425,7 +479,7 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //       // }
 
 //       const userWhoPosted = await User.findOne({ answers: ansId }).exec();
-      
+
 //       if (!userWhoPosted) {
 //         return res.json({ status: "FAIL" });
 //       }
@@ -485,7 +539,7 @@ app.post("/answer/:ansId/vote", async function (req, res) {
       }
 
       const user = await User.findOne({
-          account_name: req.session.account_name,
+        account_name: req.session.account_name,
       }).exec();
       const uid = user._id; // Person who is voting
 
@@ -501,32 +555,32 @@ app.post("/answer/:ansId/vote", async function (req, res) {
       if (req.body.op === "upvote") {
         // Switching from up to downvote and vice versa
         //if (req.body.switch) {
-          user.reputation += 5;
-          result.downvote = result.downvote.filter((e) => !e.equals(uid));
-          console.log("upvote result", result)
+        user.reputation += 5;
+        result.downvote = result.downvote.filter((e) => !e.equals(uid));
+        console.log("upvote result", result)
         //}
 
         if (result.upvote.indexOf(uid) === -1) {
           //userWhoPosted.reputation += 5;
           result.upvote.push(uid);
-        } 
+        }
         //else {
-          // If already upvoted, remove upvote
+        // If already upvoted, remove upvote
         //  userWhoPosted.reputation -= 10;
         //  result.upvote = result.upvote.filter((e) => e !== uid);
         //}
       } else if (req.body.op === "downvote") {
         //if (req.body.switch) {
-          user.reputation -= 10;
-          result.upvote = result.upvote.filter((e) => !e.equals(uid));
+        user.reputation -= 10;
+        result.upvote = result.upvote.filter((e) => !e.equals(uid));
         //}
 
         if (result.downvote.indexOf(uid) === -1) {
-        //  userWhoPosted.reputation -= 10;
+          //  userWhoPosted.reputation -= 10;
           result.downvote.push(uid);
-        } 
+        }
         //else {
-          // If already downvoted, remove downvote
+        // If already downvoted, remove downvote
         //  userWhoPosted.reputation += 5;
         //  result.downvote = result.downvote.filter((e) => e !== uid);
         //}

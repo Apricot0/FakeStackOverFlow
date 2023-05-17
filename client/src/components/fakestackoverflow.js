@@ -8,6 +8,7 @@ import AnswerModal from './pages/AnswerModal'
 import TagsPage from './pages/TagsPage'
 import ResultPage from './pages/ResultPage.js'
 import ProfilePage from './pages/profilePage.js'  
+import MyTagPage from './pages/MyTagsPage.js'
 
 let hn
 
@@ -82,6 +83,10 @@ export default class FakeStackOverflow extends React.Component {
     } else if (this.state.currentPage === 'profilePage') {
       pageToRender = (
         <ProfilePage changeToPage={this.handlePageChange} />
+      )
+    } else if (this.state.currentPage === 'myTagsPage') {
+      pageToRender = (
+        <MyTagPage changeToPage={this.handlePageChange} />
       )
     }
 

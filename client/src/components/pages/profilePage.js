@@ -61,6 +61,16 @@ export default function ProfilePage({ changeToPage }) {
                     </button>
                 }
             </div>
+            <div>
+                            {isLoggedIn &&
+                                <button
+                                    className="headerButton"
+                                    onClick={() => changeToPage('myTagsPage')}
+                                >
+                                    My Tags
+                                </button>
+                            }
+            </div>
             <div className="headerBottom">
                 <div className="headerNumber"> You asked {list.length} Questions
                 </div>
