@@ -6,5 +6,6 @@ Add design docs in *images/*
 ## Instructions to setup and run project
 
 ## Team Member 1 Contribution
-
+Jasper Zeng - complete the main framework of the project, implement sessions, compeleted homepage, login page(login logout register etd), question submit, answer sumbit, tags page, normal user profile(include question edit, tag delete, exclude answer edit), complete admin profile page, include user delete, complete init.js, complete models( Question, User, Comments, ..)
+complete uml diagram
 ## Team Member 2 Contribution
