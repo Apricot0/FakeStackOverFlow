@@ -44,6 +44,7 @@ export default function Comment (props) {
       }
     } catch (error) {
       console.error(error);
+      alert("Error! Must be registered user");
       // Handle error if necessary
     }
   }

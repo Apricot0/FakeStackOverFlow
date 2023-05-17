@@ -70,6 +70,14 @@ export default function ProfilePage({ changeToPage }) {
                         My Tags
                     </button>
                 }
+                {isLoggedIn &&
+                    <button
+                        className="headerButton"
+                        onClick={() => changeToPage('MyAnswersPage')}
+                    >
+                        My Answers
+                    </button>
+                }
             </div>
             <div className="headerBottom">
                 <div className="headerNumber"> You asked {list.length} Questions
@@ -122,7 +130,7 @@ export default function ProfilePage({ changeToPage }) {
         questionItems = currentQuestions.map((question) => (
             <div key={question._id}>
                 <button onClick={() => changeToPage('questionEditPage', { question })}>Edit Question</button>
-                <Question question={question} changeToPage={changeToPage} />
+                <Question question={question} changeToPage={changeToPage} profile = "Y"/>
             </div>
         ))
     }

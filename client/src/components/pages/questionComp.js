@@ -5,7 +5,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default function Question(props) {
-  const { changeToPage, question } = props
+  const { changeToPage, question, profile} = props
+  Question.defaultProps = {
+    profile: 'NO'
+  };
+  
   // console.log(question);
   // let key = question.qid;
   const tagItems = question.tags.map(tag =>
@@ -31,6 +35,7 @@ export default function Question(props) {
           onClick={() => {
             updateViews()
             // TODO: Model.updateViews(question);
+            profile === "yes" ? changeToPage('editAnswerPage', { question }): 
             changeToPage('answerPage', { question })
           }
           }

@@ -124,6 +124,7 @@ export default function Answer (props) {
         })
         .catch((error) => {
             console.error(error);
+            alert("Error! Must be registered user");
         });
       // Clear the input field
       event.target.value = '';

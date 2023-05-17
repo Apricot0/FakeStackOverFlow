@@ -133,6 +133,22 @@ app.get("/tags", (req, res) => {
       res.status(500).send("Internal Server Error");
     });
 });
+app.get("/myanswers", async (req, res) => {
+  try {
+    const user = await User.findOne({ account_name: req.session.account_name });
+
+    const answers = await Answer.find({ ans_by: user._id })
+      .populate('comments')
+      .populate('upvote', 'username')
+      .populate('downvote', 'username')
+      .exec();
+
+    res.status(200).send(answers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 app.get("/mytags", async (req, res) => {
   const user = await User.findOne({ account_name: req.session.account_name })
