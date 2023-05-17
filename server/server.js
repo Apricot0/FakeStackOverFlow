@@ -17,6 +17,7 @@ const Tag = require("./models/tags");
 const Answer = require("./models/answers");
 const User = require("./models/users");
 const Comment = require("./models/comment");
+const { ObjectId } = require('mongodb');
 
 const app = express();
 
@@ -86,7 +87,7 @@ app.get("/answers/:id", async function (req, res) {
 });
 app.get("/questions/:id", (req, res) => {
   Question.findById(req.params.id)
-    .populate('answer')
+    .populate('answers')
     .populate("upvote")
     .populate("downvote")
     .populate("tags")
@@ -167,7 +168,26 @@ app.get("/questions/tags/:tagId", async (req, res) => {
 
 app.get("/userprofile", async (req, res) => {
   try {
-    //todo
+    const { account_name } = req.session;
+    console.log(account_name)
+    const user = await User.findOne({account_name: account_name}).populate({
+      path: 'questions',
+      populate: [{
+        path: 'tags',
+        model: Tag,
+        
+      },{
+        path: 'asked_by',
+        model: User
+      }
+    ]
+    })
+    .populate("answers")
+    console.log(user)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    res.status(200).send(user)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -176,21 +196,23 @@ app.get("/userprofile", async (req, res) => {
 
 app.post("/questions/:id/postAnswer", async (req, res) => {
   console.log(req.params.id);
+  account_name = req.session.account_name;
+  const user = await User.findOne({ account_name: account_name });
   const questionId = req.params.id;
-  const { username, inputText } = req.body;
-  console.log(username);
+  const {inputText } = req.body;
   console.log(inputText);
   try {
     const question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
     }
-    const newAnswer = new Answer({ text: inputText, ans_by: username });
+    const newAnswer = new Answer({ text: inputText, ans_by: user._id });
     const savedAnswer = await newAnswer.save();
     console.log(savedAnswer);
     question.answers.push(savedAnswer);
     const savedQuestion = await question.save();
     const populatedQuestion = await Question.findById(savedQuestion._id)
+    .populate("asked_by")
       .populate("tags")
       .populate("answers");
     res.status(201).json(populatedQuestion);
@@ -242,7 +264,7 @@ app.post("/questions/postquestion", async (req, res) => {
     await user.save();
 
     res.sendStatus(200);
-  } catch (err) {
+  } catch (err) { 
     console.error(err);
     res.status(500).send("Internal Server Error");
   }
@@ -267,7 +289,7 @@ app.post("/register", async (req, res) => {
       user.save();
       res.status(200).json({ message: "Registration successful" });
     });
-  }
+  }ddd
 });
 
 app.post("/login", async (req, res) => {
@@ -318,7 +340,7 @@ app.post("/question/:qstnId/vote", async function (req, res) {
       }
 
       const user = await User.findOne({
-        username: req.session.username,
+        account_name: req.session.account_name,
       }).exec();
       console.log(user);
       const uid = user._id; // Person who is voting
@@ -327,46 +349,54 @@ app.post("/question/:qstnId/vote", async function (req, res) {
         return res.json({ status: "LOW-REPUTATION" });
       }
 
-      const userWhoPosted = await User.findOne({ questions: qstnId }).exec();
-      if (!userWhoPosted) {
-        return res.json({ status: "FAIL" });
-      }
+      console.log("vote", user);
+      console.log("vote", result);
+
+      //const userWhoPosted = await User.findOne({ questions: qstnId }).exec();
+      //if (!userWhoPosted) {
+      //  return res.json({ status: "FAIL" });
+      //}
 
       if (req.body.op === "upvote") {
         // Switching from up to downvote and vice versa
-        if (req.body.switch) {
-          userWhoPosted.reputation += 5;
-          result.downvote = result.downvote.filter((e) => e !== uid);
-        }
+        //if (req.body.switch) {
+          user.reputation += 5;
+          result.downvote = result.downvote.filter((e) => !e.equals(uid));
+          console.log("upvote result", result)
+        //}
 
         if (result.upvote.indexOf(uid) === -1) {
-          userWhoPosted.reputation += 5;
+          //userWhoPosted.reputation += 5;
           result.upvote.push(uid);
-        } else {
+        } 
+        //else {
           // If already upvoted, remove upvote
-          userWhoPosted.reputation -= 10;
-          result.upvote = result.upvote.filter((e) => e !== uid);
-        }
+        //  userWhoPosted.reputation -= 10;
+        //  result.upvote = result.upvote.filter((e) => e !== uid);
+        //}
       } else if (req.body.op === "downvote") {
-        if (req.body.switch) {
-          userWhoPosted.reputation -= 10;
-          result.upvote = result.upvote.filter((e) => e !== uid);
-        }
+        //if (req.body.switch) {
+          user.reputation -= 10;
+          result.upvote = result.upvote.filter((e) => !e.equals(uid));
+        //}
 
         if (result.downvote.indexOf(uid) === -1) {
-          userWhoPosted.reputation -= 10;
+        //  userWhoPosted.reputation -= 10;
           result.downvote.push(uid);
-        } else {
+        } 
+        //else {
           // If already downvoted, remove downvote
-          userWhoPosted.reputation += 5;
-          result.downvote = result.downvote.filter((e) => e !== uid);
-        }
+        //  userWhoPosted.reputation += 5;
+        //  result.downvote = result.downvote.filter((e) => e !== uid);
+        //}
       } else {
         return res.json({ status: "FAIL" });
       }
 
-      await userWhoPosted.save();
+      await user.save();
       await result.save();
+      console.log("after vote", user);
+      console.log("after vote", result);
       return res.json({ status: "SUCCESS" });
     } else {
       return res.json({ status: "FAIL" });
@@ -502,3 +532,75 @@ app.post("/answer/:ansId/vote", async function (req, res) {
 //     return res.json({ status: "FAIL" });
 //   }
 // });
+
+app.post("/answer/:ansId/vote", async function (req, res) {
+  try {
+    if (req.session.account_name) {
+      const ansId = req.params.ansId;
+
+      const result = await Answer.findById(ansId).exec();
+      if (!result) {
+        return res.json({ status: "FAIL" });
+      }
+
+      const user = await User.findOne({
+          account_name: req.session.account_name,
+      }).exec();
+      const uid = user._id; // Person who is voting
+
+      // if (!user || user.reputation < 50) {
+      //   return res.json({ status: "LOW-REPUTATION" });
+      // }
+
+      //const userWhoPosted = await User.findOne({ answers: ansId }).exec();
+      if (!user) {
+        return res.json({ status: "FAIL" });
+      }
+
+      if (req.body.op === "upvote") {
+        // Switching from up to downvote and vice versa
+        //if (req.body.switch) {
+          user.reputation += 5;
+          result.downvote = result.downvote.filter((e) => !e.equals(uid));
+          console.log("upvote result", result)
+        //}
+
+        if (result.upvote.indexOf(uid) === -1) {
+          //userWhoPosted.reputation += 5;
+          result.upvote.push(uid);
+        } 
+        //else {
+          // If already upvoted, remove upvote
+        //  userWhoPosted.reputation -= 10;
+        //  result.upvote = result.upvote.filter((e) => e !== uid);
+        //}
+      } else if (req.body.op === "downvote") {
+        //if (req.body.switch) {
+          user.reputation -= 10;
+          result.upvote = result.upvote.filter((e) => !e.equals(uid));
+        //}
+
+        if (result.downvote.indexOf(uid) === -1) {
+        //  userWhoPosted.reputation -= 10;
+          result.downvote.push(uid);
+        } 
+        //else {
+          // If already downvoted, remove downvote
+        //  userWhoPosted.reputation += 5;
+        //  result.downvote = result.downvote.filter((e) => e !== uid);
+        //}
+      } else {
+        return res.json({ status: "FAIL" });
+      }
+
+      await user.save();
+      await result.save();
+      return res.json({ status: "SUCCESS" });
+    } else {
+      return res.json({ status: "FAIL" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: "FAIL" });
+  }
+});

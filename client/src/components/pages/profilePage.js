@@ -4,36 +4,44 @@ import Question from './questionComp'
 import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import model from '../../models/model'
 
 axios.defaults.withCredentials = true;
 //TODO>>>>>>>>>>>>
-export default function ProfilePage({ changeToPage}) {
+export default function ProfilePage({ changeToPage }) {
     // const tagSideItem = document.querySelector('#tag');
     // tagSideItem.classList.remove('active');
     // const questionSideItem = document.querySelector('#question');
     // questionSideItem.classList.add('active');
-    const headerName = 'User Profile' 
+    const headerName = 'User Profile'
     const [ordering, setOrdering] = useState('Newest')
     const isLoggedIn = document.cookie.includes('isLoggedIn=true')
     const [currentPage, setCurrentPage] = useState(1)
     const [list, setQuestions] = useState([])
+    const [timeDifference, setTimeDifference] = useState("")
+    const [reputation, setReputation] = useState(0)
     const questionsPerPage = 5
-    const username = "";
-    const memeberSince = "";
-    const reputation = "";
 
     useEffect(() => {
-        const fetchQuestions = async () => {
-          try {
-            const response = await axios.get(`http://localhost:8000/userprofile`)
-            console.log(response.data);
-            //setQuestions(response.data)
-          } catch (error) {
-            console.error(error)
-          }
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8000/userprofile`)
+                console.log(response.data);
+                const memberDate = new Date(response.data.create_date);
+
+                // Construct the user-friendly duration message
+                let durationMessage = model.dateFormat(memberDate);
+                setTimeDifference(durationMessage);
+                setReputation(response.data.reputation);
+                console.log(response.data.reputation);
+                setQuestions(response.data.questions)
+                //setQuestions(response.data)
+            } catch (error) {
+                console.error(error)
+            }
         }
-        fetchQuestions()
-      }, [ordering])
+        fetchProfile()
+    }, [])
     // Create the header element
     const handleOrderingChange = (page) => {
         setOrdering(page)
@@ -42,6 +50,8 @@ export default function ProfilePage({ changeToPage}) {
         <div className="header">
             <div className="headerTop">
                 <div className="headerTitle">{headerName}</div>
+                <div className="headerTitle">You have been a member {timeDifference}</div>
+                <div className="headerTitle">reputation: {reputation}</div>
                 {isLoggedIn &&
                     <button
                         className="headerButton"
@@ -52,7 +62,7 @@ export default function ProfilePage({ changeToPage}) {
                 }
             </div>
             <div className="headerBottom">
-                <div className="headerNumber">{list.length} Questions
+                <div className="headerNumber"> You asked {list.length} Questions
                 </div>
                 <div className="headerordering">
                     <button
@@ -87,6 +97,7 @@ export default function ProfilePage({ changeToPage}) {
         qList = Model.getActiveInList(list)
     } else if (ordering === 'Unanswered') {
         qList = Model.getUnansweredInList(list)
+        //console.log(qList);
     }
     if (typeof qList === 'undefined' || qList.length === 0) {
         questionItems = (

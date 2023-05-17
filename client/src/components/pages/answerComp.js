@@ -10,7 +10,7 @@ export default function Answer (props) {
   // const real = await axios.get(`http://localhost:8000/answers/${ans._id}`);
     // console.log(ans);
     const [answer, setCurrentAnswer] = useState(ans);
-    const [voteStatus, setVoteStatus] = useState('');
+    //const [voteStatus, setVoteStatus] = useState('');
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -31,7 +31,7 @@ export default function Answer (props) {
     try {
       const response = await axios.post(`http://localhost:8000/answer/${answer._id}/vote`, {
       op: 'upvote',
-      switch: voteStatus === 'downvote',
+      //switch: voteStatus === 'downvote',
     })
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/answers/${answer._id}`);
@@ -50,7 +50,7 @@ export default function Answer (props) {
     try {
       const response = await axios.post(`http://localhost:8000/answer/${answer._id}/vote`, {
         op: 'downvote',
-        switch: voteStatus === 'upvote',
+        //switch: voteStatus === 'upvote',
       });
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/answers/${answer._id}`);

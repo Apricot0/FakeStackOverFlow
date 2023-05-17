@@ -13,17 +13,17 @@ import PropTypes from 'prop-types';
 export default function AnswerPage ({ changeToPage, question }) {
   async function submitAnswer (event, question) {
     event.preventDefault()
-    const usernameInput = document.querySelector('#username')
+    //const usernameInput = document.querySelector('#username')
     const answerTextInput = document.querySelector('#input_text')
-    const username = usernameInput.value.trim()
+    //const username = usernameInput.value.trim()
     const answerText = answerTextInput.value.trim()
     // Clear input fields
-    usernameInput.value = ''
+    //usernameInput.value = ''
     answerTextInput.value = ''
     // console.log(question);
     const questionId = question._id
     axios.post(`http://localhost:8000/questions/${questionId}/postAnswer`, {
-      username,
+      //username,
       inputText: answerText
     })
       .then((response) => {
@@ -68,7 +68,7 @@ export default function AnswerPage ({ changeToPage, question }) {
   return (
     <form action="#" method="post" id="form" onSubmit={(e) => submitAnswer(e, question)}>
       <div className="form-container">
-        <div className="input">
+        {/*<div className="input">
           <label htmlFor="username">Username*</label>
           <input
             type="text"
@@ -78,6 +78,7 @@ export default function AnswerPage ({ changeToPage, question }) {
             required
           />
         </div>
+          */}
         <div className="input">
           <label htmlFor="input_text">Answer Text*</label>
           <em>Add details</em>
