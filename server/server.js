@@ -157,25 +157,25 @@ app.get("/mytags", async (req, res) => {
 
       Tag.aggregate([
         {
-            $match: {
-              _id: { $in: combinedTags },
-            },
+          $match: {
+            _id: { $in: combinedTags },
           },
-          {
-            $lookup: {
-              from: "questions",
-              localField: "_id",
-              foreignField: "tags",
-              as: "questions",
-            },
+        },
+        {
+          $lookup: {
+            from: "questions",
+            localField: "_id",
+            foreignField: "tags",
+            as: "questions",
           },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              questionCount: { $size: "$questions" },
-            },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            questionCount: { $size: "$questions" },
           },
+        },
       ])
         .then((tags) => {
           // console.log(tags);
@@ -527,6 +527,33 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //     return res.json({ status: "FAIL" });
 //   }
 // });
+
+app.get("/deleteTag/:tagID", async function (req, res) { 
+  if (!req.session.username) {
+    return res.json({ status: "FAIL", message: "You must be logged in to delete a tag." });
+  }
+  try {
+    const tagID = req.params.tagID;
+    const user = await User.findOne({ account_name: req.session.account_name }).exec();
+    // Check if any other user has used the tag in their questions
+    const usersWithQuestionTag = await User.find({
+      _id: { $ne: user._id }, // Exclude the current user
+      "questions.tags": tagID
+    }).exec();
+    if (usersWithQuestionTag.length > 0) {
+      return res.json({ status: "ERROR", message: "Tag is being used by other users' questions. Cannot delete." });
+    }
+    // Update all questions that have the tag and remove the reference
+    await Question.updateMany({ tags: tagID }, { $pull: { tags: tagID } }).exec();
+    // Delete the tag
+    await Tag.findByIdAndDelete(tagID).exec();
+
+    return res.json({ status: "SUCCESS", message: "Tag deleted successfully." });
+  } catch (error) {
+    console.error(error);
+    return res.json({ status: "ERROR", message: "Failed to delete tag." });
+  }
+});
 
 app.post("/answer/:ansId/vote", async function (req, res) {
   try {

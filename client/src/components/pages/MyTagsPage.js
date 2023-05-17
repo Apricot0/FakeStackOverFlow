@@ -5,6 +5,9 @@ import axios from 'axios'
 import React from 'react'
 import PropTypes from 'prop-types'
 
+axios.defaults.withCredentials = true;
+
+
 export default function MyTagPage ({ changeToPage }) {
   const [tags, setTags] = useState([])
 
@@ -19,6 +22,17 @@ export default function MyTagPage ({ changeToPage }) {
   }, [])
   console.log(tags)
 
+  const deleteTag = async (tagId) => {
+    try {
+      axios.get(`http://localhost:8000/deleteTag/${tagId}`)
+      const response = await axios.get('http://localhost:8000/mytags')
+      setTags(response.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+
   let tagsList
   if (typeof tags === 'undefined' || tags.length === 0) {
     tagsList = (
@@ -30,6 +44,7 @@ export default function MyTagPage ({ changeToPage }) {
     tagsList = tags.map((tag) => (
             <div key={tag._id}>
                 <Tag tag={tag} changeToPage={changeToPage} />
+                <button onClick={() => deleteTag(tag._id)}>Delete Tag</button>
             </div>
     ))
   }
