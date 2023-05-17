@@ -196,21 +196,23 @@ app.get("/userprofile", async (req, res) => {
 
 app.post("/questions/:id/postAnswer", async (req, res) => {
   console.log(req.params.id);
+  account_name = req.session.account_name;
+  const user = await User.findOne({ account_name: account_name });
   const questionId = req.params.id;
-  const { username, inputText } = req.body;
-  console.log(username);
+  const {inputText } = req.body;
   console.log(inputText);
   try {
     const question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
     }
-    const newAnswer = new Answer({ text: inputText, ans_by: username });
+    const newAnswer = new Answer({ text: inputText, ans_by: user._id });
     const savedAnswer = await newAnswer.save();
     console.log(savedAnswer);
     question.answers.push(savedAnswer);
     const savedQuestion = await question.save();
     const populatedQuestion = await Question.findById(savedQuestion._id)
+    .populate("asked_by")
       .populate("tags")
       .populate("answers");
     res.status(201).json(populatedQuestion);

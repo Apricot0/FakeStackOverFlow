@@ -1,5 +1,5 @@
 import Model from "../../models/model";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Answer from "./answerComp";
 import React from "react";
 import axios from 'axios'
