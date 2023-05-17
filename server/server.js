@@ -339,6 +339,8 @@ app.post("/usersdelete/:id", async (req, res) => {
     const { id } = req.params;
     console.log("IIIIIIIIDDDDDDDDDDDDD",id);// Delete the user by their ID
     await User.findByIdAndDelete(id);
+    await Question.deleteMany({ asked_by: id });
+    await Answer.deleteMany({ ans_by: id });
 
     // Delete any associated data or perform additional cleanup if necessary
 
