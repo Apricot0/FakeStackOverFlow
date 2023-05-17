@@ -259,6 +259,13 @@ app.get("/userprofile", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
+    if (user.role === 'Admin') {
+      User.find({ role: 'Registered' }).then((users) => {
+        console.log(users)
+        return res.status(200).send({ admin: true, users })
+      })
+      return
+    }
     res.status(200).send(user)
   } catch (error) {
     console.error(error);
@@ -343,6 +350,26 @@ app.post("/questions/postquestion", async (req, res) => {
   }
 });
 
+app.post("/usersdelete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("IIIIIIIIDDDDDDDDDDDDD",id);// Delete the user by their ID
+    await User.findByIdAndDelete(id);
+    await Question.deleteMany({ asked_by: id });
+    await Answer.deleteMany({ ans_by: id });
+
+    // Delete any associated data or perform additional cleanup if necessary
+
+    // Respond with a success message
+    res.json({ status: "User deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    // Respond with an error message
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+
 app.post("/questions/:questionId/editquestion", async (req, res) => {
   const { title, summary, text, tags } = req.body;
   const { questionId } = req.params;
@@ -375,18 +402,18 @@ app.post("/questions/:questionId/editquestion", async (req, res) => {
     if (!question) {
       return res.status(404).json({ message: "Question not found" });
     }
-    
+
     if (!user.questions.includes(question._id)) {
       return res.status(403).json({ message: "You are not the owner of this question" });
     }
-    
+
     question.title = title;
     question.summary = summary;
     question.text = text;
     question.tags = savedTags;
-    
+
     await question.save();
-    
+
 
     res.sendStatus(200);
   } catch (err) {
@@ -416,7 +443,7 @@ app.post("/register", async (req, res) => {
       user.save();
       res.status(200).json({ message: "Registration successful" });
     });
-  }ddd
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -720,7 +747,7 @@ app.post('/question/:qstnId/postcomment', async (req, res) => {
         await comment.save();
         await result.save();
 
-        return res.json({ status: 'SUCCESS', comment: comment , result: result});
+        return res.json({ status: 'SUCCESS', comment: comment, result: result });
       } else {
         return res.json({ status: 'LOW-REPUTATION' });
       }

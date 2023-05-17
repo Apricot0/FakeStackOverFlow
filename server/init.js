@@ -53,7 +53,7 @@ bcrypt.hash(password, saltRounds, (err, hash) => {
         });
 } 
 ); 
-// Create a script to populate the database with test data.
+/* // Create a script to populate the database with test data.
 // Generate random user data using Faker
 const generateRandomUserData = () => {
     const username = faker.name.findName();
@@ -116,4 +116,4 @@ const generateTestData = async () => {
     }
   };
 
-    generateTestData();
+    generateTestData(); */

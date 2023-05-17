@@ -5,6 +5,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import model from '../../models/model'
+import UserComp from './userComp'
 
 axios.defaults.withCredentials = true;
 //TODO>>>>>>>>>>>>
@@ -18,15 +19,22 @@ export default function ProfilePage({ changeToPage }) {
     const isLoggedIn = document.cookie.includes('isLoggedIn=true')
     const [currentPage, setCurrentPage] = useState(1)
     const [list, setQuestions] = useState([])
+    const [users, setUsers] = useState([])
     const [timeDifference, setTimeDifference] = useState("")
     const [reputation, setReputation] = useState(0)
+    const [admin, setAdmin] = useState(false)
     const questionsPerPage = 5
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const response = await axios.get(`http://localhost:8000/userprofile`)
-                console.log(response.data);
+                console.log("userprofile",response.data);
+                if (response.data.admin === true) {
+                    setAdmin(true);
+                    setUsers(response.data.users)
+                    return;
+                }
                 const memberDate = new Date(response.data.create_date);
 
                 // Construct the user-friendly duration message
@@ -45,6 +53,16 @@ export default function ProfilePage({ changeToPage }) {
     // Create the header element
     const handleOrderingChange = (page) => {
         setOrdering(page)
+    }
+    const userDelete = async (id) => {
+        try {
+            const response = await axios.post(`http://localhost:8000/usersdelete/${id}`)
+            const newUsers = await axios.get(`http://localhost:8000/userprofile`)
+            console.log(response.data);
+            setUsers(newUsers.data.users)
+        } catch (error) {
+            console.error(error)
+        }
     }
     const header = (
         <div className="header">
@@ -149,6 +167,14 @@ export default function ProfilePage({ changeToPage }) {
 
     return (
         <>
+         {admin ? (<><div>{users.map((user) => (
+      <div key={user._id}>
+        <UserComp user={user} changeToPage={changeToPage} />
+        <button onClick={() => userDelete(user._id) }>Delete User</button>
+      </div>
+    ))}</div>
+         </>):(
+            <>
             {header}
             <div className="content-container question-list">{questionItems}</div>
             <div className="pagination-buttons">
@@ -160,8 +186,10 @@ export default function ProfilePage({ changeToPage }) {
                 </button>
                 <p>{indexOfFirstQuestion}......{indexOfLastQuestion}</p>
             </div>
+            </>
+         )}
         </>
-    )
+    );
 }
 ProfilePage.propTypes = {
     changeToPage: PropTypes.func,

@@ -44,13 +44,14 @@ exports.getAllQuestions = async (res, ordering) => {
       sortQuery = { ask_date_time: -1 }
       break
   }
-  Question.find()
+  await Question.find()
   .sort(sortQuery)
   .populate('tags')
   .populate('answers')
   .populate('asked_by', 'username')
   .populate('comments')
   .then((questions) => {
+    console.log(questions);
     const modifiedQuestions = questions.map((question) => {
       const modifiedQuestion = {
         ...question._doc, // Copy the question object

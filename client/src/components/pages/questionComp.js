@@ -15,6 +15,7 @@ export default function Question(props) {
   const tagItems = question.tags.map(tag =>
     <div key={tag._id} className="tag">{tag.name}</div>
   )
+  console.log("question Problem",question)
   const updateViews = () => {
     axios.put(`http://localhost:8000/questions/${question._id}/views`)
       .catch((err) => {
