@@ -11,7 +11,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
   const [currentPage, setCurrentPage] = useState(1);
   const answersPerPage = 5;
   // const [reputationError, setReputationError] = useState(false);
-  const [voteStatus, setVoteStatus] = useState('');
+  //const [voteStatus, setVoteStatus] = useState('');
 
   console.log(question_in);
   const [question, setCurrentQuestion] = useState(question_in);
@@ -33,7 +33,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
     try {
       const response = await axios.post(`http://localhost:8000/question/${question._id}/vote`, {
         op: 'upvote',
-        switch: voteStatus === 'downvote',
+        //switch: voteStatus === 'downvote',
       });
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/questions/${question._id}`);
@@ -51,7 +51,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
     try {
       const response = await axios.post(`http://localhost:8000/question/${question._id}/vote`, {
         op: 'downvote',
-        switch: voteStatus === 'upvote',
+        //switch: voteStatus === 'upvote',
       });
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/questions/${question._id}`);
