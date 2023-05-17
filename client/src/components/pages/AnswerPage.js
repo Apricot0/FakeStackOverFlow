@@ -12,6 +12,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPage2, setCurrentPage2] = useState(1);
   const answersPerPage = 5;
+  const isLoggedIn = document.cookie.includes('isLoggedIn=true');
   // const [reputationError, setReputationError] = useState(false);
   //const [voteStatus, setVoteStatus] = useState('');
 
@@ -40,7 +41,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
       if (response.data.status === 'SUCCESS') {
         const res = await axios.get(`http://localhost:8000/questions/${question._id}`);
         setCurrentQuestion(res.data);
-      } else if(response.data.status === "LOW-REPUTATION"){
+      } else if (response.data.status === "LOW-REPUTATION") {
         alert("Your reputation must be 50 or higher to vote!");
       }
     } catch (error) {
@@ -59,7 +60,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
         const res = await axios.get(`http://localhost:8000/questions/${question._id}`);
         console.log(res.data);
         setCurrentQuestion(res.data);
-      } else if(response.data.status === "LOW-REPUTATION"){
+      } else if (response.data.status === "LOW-REPUTATION") {
         alert("Your reputation must be 50 or higher to vote!");
       }
     } catch (error) {
@@ -67,7 +68,7 @@ export default function AnswerPage({ changeToPage, question_in }) {
     }
   }
 
-  let votes = question.upvote - question.downvote;
+  let votes = question.upvote.length - question.downvote.length;
 
   // Create header element
   const header = (
@@ -75,26 +76,28 @@ export default function AnswerPage({ changeToPage, question_in }) {
       <div className="headerQuestion">
         <div className="headerTitle">{`${question.answers.length} Answers`}</div>
         <div className="questionTitle">{question.title}</div>
-        <button
-          className="headerButton"
-          onClick={() => {
-            changeToPage("questionModal");
-          }}
-        >
-          Ask Question
-        </button>
+        {isLoggedIn &&
+          <button
+            className="headerButton"
+            onClick={() => {
+              changeToPage("questionModal");
+            }}
+          >
+            Ask Question
+          </button>
+        }
       </div>
       <div className="headerQuestion">
         <div className="headerInfo">
-          <button id= "upvote" className="vote-button" onClick={upvote_q}>
-            <span className ="vote-icon">&#9650;</span>
+          <button id="upvote" className="vote-button" onClick={upvote_q}>
+            <span className="vote-icon">&#9650;</span>
           </button>
           <span
-              className ="vote-count"
-              id="upvote"
-            >{`Votes: ${votes}`}</span>
-          <button id="downvote" className ="vote-button" onClick={downvote_q}>
-            <span className ="vote-icon">&#9660;</span>
+            className="vote-count"
+            id="upvote"
+          >{`Votes: ${votes}`}</span>
+          <button id="downvote" className="vote-button" onClick={downvote_q}>
+            <span className="vote-icon">&#9660;</span>
           </button>
           <div className="headerNumber">{`${question.views} views`}</div>
         </div>
@@ -227,21 +230,23 @@ export default function AnswerPage({ changeToPage, question_in }) {
     />
         {answerItems}
         <div className="pagination-buttons">
-        <button className="ordering" disabled={isFirstPage} onClick={goToPreviousPage}>
-          Prev
-        </button>
-        <button className="ordering" disabled={isLastPage} onClick={goToNextPage}>
-          Next
-        </button>
-        <p>{indexOfFirstAnswer}......{indexOfLastAnswer}</p>
-      </div>
-        <button
-          className="botButton"
-          id="postAnswer"
-          onClick={() => changeToPage("answerModal", { question })}
-        >
-          Answer Question
-        </button>
+          <button className="ordering" disabled={isFirstPage} onClick={goToPreviousPage}>
+            Prev
+          </button>
+          <button className="ordering" disabled={isLastPage} onClick={goToNextPage}>
+            Next
+          </button>
+          <p>{indexOfFirstAnswer}......{indexOfLastAnswer}</p>
+        </div>
+        {isLoggedIn &&
+          <button
+            className="botButton"
+            id="postAnswer"
+            onClick={() => changeToPage("answerModal", { question })}
+          >
+            Answer Question
+          </button>
+        }
       </div>
     </>
   );

@@ -25,7 +25,7 @@ export default function Answer (props) {
         }
       };
       fetchData();
-    }, []);
+    }, [ans._id]);
   useEffect(() => {
     setCurrentAnswer(answer);
   }, [answer]);
@@ -64,6 +64,7 @@ export default function Answer (props) {
       console.error(error);
     }
   }
+  console.log(answer);
   let votes = answer.upvote.length - answer.downvote.length;
   
   const commentsPerPage =3;

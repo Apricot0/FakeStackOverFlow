@@ -25,13 +25,13 @@ exports.getAllQuestions = async (res, ordering) => {
         const modifiedQuestions = questions.map((question) => {
           const modifiedQuestion = {
             ...question._doc, // Copy the question object
-            downvote: question.downvote.length, // Replace downvote array with its count
-            upvote: question.upvote.length, // Replace upvote array with its count
+            //downvote: question.downvote.length, // Replace downvote array with its count
+            //upvote: question.upvote.length, // Replace upvote array with its count
           };
           return modifiedQuestion;
         });
     
-        //console.log(modifiedQuestions);
+        console.log(modifiedQuestions);
         res.status(200).send(modifiedQuestions);
       })
       .catch((error) => {
@@ -52,8 +52,8 @@ exports.getAllQuestions = async (res, ordering) => {
     const modifiedQuestions = questions.map((question) => {
       const modifiedQuestion = {
         ...question._doc, // Copy the question object
-        downvote: question.downvote.length, // Replace downvote array with its count
-        upvote: question.upvote.length, // Replace upvote array with its count
+        //downvote: question.downvote.length, // Replace downvote array with its count
+        //upvote: question.upvote.length, // Replace upvote array with its count
       };
       return modifiedQuestion;
     });

@@ -22,7 +22,7 @@ export default function Question(props) {
       <div className="counts">
         <div className="count">{question.answers.length} answers</div>
         <div className="count">{question.views} views</div>
-        <div className="count">{question.upvote+question.downvote} votes</div>
+        <div className="count">{question.upvote.length-question.downvote.length} votes</div>
       </div>
       <div className="question-container">
         <div
@@ -36,7 +36,7 @@ export default function Question(props) {
           }
         >
           {question.title}
-          <p className='question_summary'>
+          <p className='questionsummary'>
             {question.summary}
           </p>
         </div>
