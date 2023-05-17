@@ -61,6 +61,7 @@ export default function Answer (props) {
       console.error(error);
     }
   }
+  console.log(answer);
   let votes = answer.upvote.length - answer.downvote.length;
 
   return (

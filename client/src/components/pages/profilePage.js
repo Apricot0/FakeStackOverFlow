@@ -62,14 +62,14 @@ export default function ProfilePage({ changeToPage }) {
                 }
             </div>
             <div>
-                            {isLoggedIn &&
-                                <button
-                                    className="headerButton"
-                                    onClick={() => changeToPage('myTagsPage')}
-                                >
-                                    My Tags
-                                </button>
-                            }
+                {isLoggedIn &&
+                    <button
+                        className="headerButton"
+                        onClick={() => changeToPage('myTagsPage')}
+                    >
+                        My Tags
+                    </button>
+                }
             </div>
             <div className="headerBottom">
                 <div className="headerNumber"> You asked {list.length} Questions
@@ -121,6 +121,7 @@ export default function ProfilePage({ changeToPage }) {
         var currentQuestions = qList.slice(indexOfFirstQuestion, indexOfLastQuestion);
         questionItems = currentQuestions.map((question) => (
             <div key={question._id}>
+                <button onClick={() => changeToPage('questionEditPage', { question })}>Edit Question</button>
                 <Question question={question} changeToPage={changeToPage} />
             </div>
         ))

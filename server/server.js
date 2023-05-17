@@ -233,10 +233,12 @@ app.get("/userprofile", async (req, res) => {
       }, {
         path: 'asked_by',
         model: User
+      }, {
+        path: 'answers',
+        model: Answer,
       }
       ]
     })
-      .populate("answers")
     console.log(user)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -323,6 +325,60 @@ app.post("/questions/postquestion", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+app.post("/questions/:questionId/editquestion", async (req, res) => {
+  const { title, summary, text, tags } = req.body;
+  const { questionId } = req.params;
+  try {
+    console.log("post question session:", req.session);
+    account_name = req.session.account_name;
+    console.log(account_name);
+    const user = await User.findOne({ account_name: account_name });
+    console.log("user find:", user);
+    const savedTags = [];
+    for (const tagName of tags) {
+      const iftag = await Tag.find({ name: tagName });
+      if (iftag.length === 0) {
+        //user can not create tag if reputation is less than 50
+        if (user.reputation < 50) {
+          return res
+            .status(403)
+            .json({
+              message: "You do not have enough reputation to create a new tag",
+            });
+        }
+        const tag = new Tag({ name: tagName });
+        const newTag = await tag.save();
+        savedTags.push(newTag);
+      } else {
+        savedTags.push(iftag[0]);
+      }
+    }
+    const question = await Question.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+    
+    if (!user.questions.includes(question._id)) {
+      return res.status(403).json({ message: "You are not the owner of this question" });
+    }
+    
+    question.title = title;
+    question.summary = summary;
+    question.text = text;
+    question.tags = savedTags;
+    
+    await question.save();
+    
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
@@ -528,7 +584,7 @@ app.post("/question/:qstnId/vote", async function (req, res) {
 //   }
 // });
 
-app.get("/deleteTag/:tagID", async function (req, res) { 
+app.get("/deleteTag/:tagID", async function (req, res) {
   if (!req.session.username) {
     return res.json({ status: "FAIL", message: "You must be logged in to delete a tag." });
   }

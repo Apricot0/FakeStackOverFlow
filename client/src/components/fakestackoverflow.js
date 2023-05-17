@@ -9,6 +9,7 @@ import TagsPage from './pages/TagsPage'
 import ResultPage from './pages/ResultPage.js'
 import ProfilePage from './pages/profilePage.js'  
 import MyTagPage from './pages/MyTagsPage.js'
+import QuestionEdit from './pages/questionEdit.js'
 
 let hn
 
@@ -88,7 +89,17 @@ export default class FakeStackOverflow extends React.Component {
       pageToRender = (
         <MyTagPage changeToPage={this.handlePageChange} />
       )
-    }
+    } else if (this.state.currentPage === 'questionEditPage') {
+      pageToRender = (
+        <>
+        {this.state.qe
+          ? (
+          <QuestionEdit changeToPage={this.handlePageChange} question_in={this.state.qe} />
+            )
+          : null}
+        </>
+      )
+          }
 
     return (
       <div className="container">
