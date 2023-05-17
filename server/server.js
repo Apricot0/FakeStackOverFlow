@@ -427,7 +427,7 @@ app.post("/register", async (req, res) => {
       user.save();
       res.status(200).json({ message: "Registration successful" });
     });
-  } ddd
+  }
 });
 
 app.post("/login", async (req, res) => {
