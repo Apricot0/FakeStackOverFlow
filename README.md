@@ -1,3 +1,6 @@
+#FakeStackOverFlow
+Final project for Stony Brook University's software development course. We try to imitate the StackOverflow website and build a similar question and answer platform. The UI of the platform is relatively simple because of the limited time of a week, but most of the functions are complete. The development process uses react, express, html, css, javascript, MongoDB, axios, cors and other development tools. The development content includes front-end and back-end. Users can log in to interact with questions and answers and perform simple operations on accounts. Administrators can perform operations on registered users.
+
 ## Instructions to setup and run the project
 1. Make sure Node.js and an installation of MongoDB is up and running for your operating system. To install the latter, head to: https://www.mongodb.com/docs/manual/installation
 
